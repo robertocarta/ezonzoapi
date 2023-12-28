@@ -24,6 +24,7 @@ class Product(Base):
     thumbnail = Column(String)
     tags = Column(String)
     shopid = Column(Integer, ForeignKey("shop.id"), index=True)
+    price = Column(Float, index=True)
 
 
 Base.metadata.create_all(bind=engine)
