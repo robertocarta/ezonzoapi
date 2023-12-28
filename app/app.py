@@ -4,12 +4,16 @@ from mangum import Mangum
 from fastapi.responses import JSONResponse
 import uvicorn
 
+import app.models
+
 app = FastAPI()
 handler = Mangum(app)
 
+
+
 @app.get("/")
 def read_root():
-    return {"Welcome to": "My first FastAPI depolyment using Docker image"}
+    return {"Welcome to": "LATEST"}
 
 @app.get("/{text}")
 def read_item(text: str):
