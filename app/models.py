@@ -1,5 +1,7 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, Float, Index, text
-from app.database import Base, engine
+from sqlalchemy.orm import Session
+from app.database import Base
+from app.schemas import ShopCreate
 
 
 class Shop(Base):
@@ -15,6 +17,17 @@ class Shop(Base):
         Index('idx_shop_location', text("point(lat, lon)"), postgresql_using="gist"),
         )
 
+    @classmethod
+    def get_or_create(cls, db: Session, shop_data: ShopCreate):
+        shop = db.query(cls).filter(Shop.name == shop_data.name).first()
+        if shop:
+            return shop
+        new_shop = Shop(**shop_data.dict())
+        db.add(new_shop)
+        db.commit()
+        db.refresh(new_shop)
+        return new_shop
+
 
 class Product(Base):
     __tablename__ = 'product'
@@ -27,4 +40,3 @@ class Product(Base):
     price = Column(Float, index=True)
 
 
-Base.metadata.create_all(bind=engine)
