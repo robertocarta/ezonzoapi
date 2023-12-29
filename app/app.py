@@ -1,34 +1,35 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Query
 from mangum import Mangum
 import uvicorn
 
-from app.database import SessionLocal, engine
+from app.database import db_setup
 from app.schemas import ProductCreate, ProductBase
 from app.models import Base, Shop, Product, Session
 
 app = FastAPI()
 handler = Mangum(app)
 
+
+engine, SessionLocal = db_setup()
 Base.metadata.create_all(bind=engine)
 
-# Dependency
-def get_db():
-    db = SessionLocal()
+
+def get_session():
+    session = SessionLocal()
     try:
-        yield db
+        yield session
     finally:
-        db.close()
+        session.close()
 
 
-@app.post("/products/", response_model=ProductBase)
-def create_product(product_data: ProductCreate, db: Session = Depends(get_db)):
-    db = SessionLocal()
-    shop = Shop.get_or_create(db, product_data.shop)
+@app.post("/products/", response_model=ProductBase, status_code=201)
+def create_product(product_data: ProductCreate, session: Session = Depends(get_session)):
+    shop = Shop.get_or_create(session, product_data.shop)
     del product_data.shop
     new_product = Product(**product_data.dict(), shopid=shop.id)
-    db.add(new_product)
-    db.commit()
-    db.refresh(new_product)
+    session.add(new_product)
+    session.commit()
+    session.refresh(new_product)
     return new_product
 
 
