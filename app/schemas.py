@@ -23,6 +23,7 @@ class ProductBase(BaseModel):
     thumbnail: str
     tags: str
     shopid: int
+    url: str
 
     class Config:
         orm_mode = True

@@ -21,9 +21,7 @@ def get_session():
     finally:
         session.close()
 
-
-@app.post("/products/", response_model=ProductBase, status_code=201)
-def create_product(product_data: ProductCreate, session: Session = Depends(get_session)):
+def _create_product(product_data: ProductCreate, session: Session):
     shop = Shop.get_or_create(session, product_data.shop)
     del product_data.shop
     new_product = Product(**product_data.dict(), shopid=shop.id)
@@ -31,6 +29,12 @@ def create_product(product_data: ProductCreate, session: Session = Depends(get_s
     session.commit()
     session.refresh(new_product)
     return new_product
+
+
+@app.post("/products/", response_model=ProductBase, status_code=201)
+def create_product(product_data: ProductCreate, session: Session = Depends(get_session)):
+    return _create_product(product_data, session)
+
 
 
 if __name__ == "__main__":
