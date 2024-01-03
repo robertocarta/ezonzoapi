@@ -1,7 +1,8 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, Float, Index, text
 from sqlalchemy.orm import Session
-from app.database import Base
-from app.schemas import ShopCreate
+from geoalchemy2 import Geography, WKTElement
+from database import Base
+from schemas import ShopCreate
 
 
 class Shop(Base):
@@ -14,9 +15,15 @@ class Shop(Base):
     address = Column(String)
     url = Column(String)
 
-    __table_args__ = (
-        Index('idx_shop_location', text("point(lat, lon)"), postgresql_using="gist"),
-        )
+    def __init__(self, *args, **kwargs):
+        if kwargs.get('location') is None:
+            lat, lon = kwargs['lat'], kwargs['lon']
+            kwargs['location'] = WKTElement(f"POINT({lat} {lon})", srid=4326)
+        super().__init__(*args, **kwargs)
+
+
+
+
 
     @classmethod
     def get_or_create(cls, db: Session, shop_data: ShopCreate):

@@ -8,3 +8,5 @@ sqlalchemy_utils
 geoalchemy2
 pytest
 requests
+httpx
+python-dotenv
