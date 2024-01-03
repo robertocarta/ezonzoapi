@@ -39,6 +39,51 @@ Ezonzoapi is written in python 3.10 using the FastApi framework, and deployed on
 
 ![image](https://github.com/robertocarta/ezonzoapi/assets/15035783/ecb7ad52-fcc4-4179-a4d2-757049d70490)
 
+The database has two tables:
+
+One for the shops:
+```
+                                    Table "public.shop"
+  Column  |         Type          | Collation | Nullable |             Default
+----------+-----------------------+-----------+----------+----------------------------------
+ id       | integer               |           | not null | nextval('shop_id_seq'::regclass)
+ name     | character varying     |           |          |
+ lat      | double precision      |           |          |
+ lon      | double precision      |           |          |
+ location | geography(Point,4326) |           |          |
+ address  | character varying     |           |          |
+ url      | character varying     |           |          |
+Indexes:
+    "shop_pkey" PRIMARY KEY, btree (id)
+    "idx_shop_location" gist (location)
+Referenced by:
+    TABLE "product" CONSTRAINT "product_shopid_fkey" FOREIGN KEY (shopid) REFERENCES shop(id)
+```
+
+And one for the products, which references `shop`:
+
+```
+                                   Table "public.product"
+  Column   |       Type        | Collation | Nullable |               Default
+-----------+-------------------+-----------+----------+-------------------------------------
+ id        | integer           |           | not null | nextval('product_id_seq'::regclass)
+ url       | character varying |           |          |
+ name      | character varying |           |          |
+ thumbnail | character varying |           |          |
+ tags      | character varying |           |          |
+ shopid    | integer           |           |          |
+ price     | double precision  |           |          |
+Indexes:
+    "product_pkey" PRIMARY KEY, btree (id)
+    "ix_product_id" btree (id)
+    "ix_product_price" btree (price)
+    "ix_product_shopid" btree (shopid)
+Foreign-key constraints:
+    "product_shopid_fkey" FOREIGN KEY (shopid) REFERENCES shop(id)
+```
+
+NOTE: the indexes should be composite, but multi column gist indices are trivial and required some more reading, so I left it as a TODO
+
 ## Earth daily assignment:
 
 For this assignment I decided to give priority to the following instruction:
@@ -69,6 +114,13 @@ shops table:
 ```
 
 The api supports GET and POST for the `/products` endpoint. It allows to get all products within a certain distance from the user, and create new products (and shops).
+For instance 
+```
+curl -X 'GET' \
+  'https://ut0b3vuq6e.execute-api.us-east-1.amazonaws.com/dev/products/?search_str=transformer&lat=44.4910507609255&lon=11.346836656806383&max_distance=0.1' \
+  -H 'accept: application/json'
+```
+will get all the toys that match the search string "transformers" within 100 meters of a user located at (44.4910507609255, 11.346836656806383)
 
 The POST request product schema is a bit atypical, as it always includes the shop data.
 
@@ -153,12 +205,12 @@ Infrastructure code was not included, so it needs to be set up manually. You wil
 - A lambda function with access to RDS
 - An APIGateway REST api with a resource configured with lambda proxy integration
 
-Build - push -deploy:
+Build->push->deploy:
 ```
 aws ecr get-login-password --region [region] | docker login --username AWS --password-stdin [ecr repository URI] && docker build -t ezonzoapi .
 docker push [ecr repository URI]/ezonzoapi:latest
 aws lambda update-function-code \
-    --function-name ezonzoapi \
+    --function-name [function name] \
     --image-uri [repository uri ]/ezonzoapi:latest\
     --region [region]
 ```
