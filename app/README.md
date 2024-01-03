@@ -10,20 +10,20 @@ I wanted to simplify local shopping and make it competitive with online shopping
 - Shop-hopping is time demanding
 - Shop-hopping exposes you to health risks.
 
-To address the above I wanted to create, for each city area, a database of products being sold in each shop, so that one could look up the closest shop that sells the item of interest before leaving the home, and being guaranteed to find it.
+To address the above, I wanted to fill, for each city area, a database of products being sold in each local shop, so that one could look up the closest shop that sells the item of interest before leaving home, and being guaranteed to find it.
 
 Ezonzo scrapes the local businesses' online catalogues and stores the products in a single data store together with the shops' data. An web interface allows for search functionality.
 
 To scrape businesses I built a scraping framework on top of scrapy that is specific to online shops/catalogues and is configurable with a simple json configuration for each new website to scrape. It supports both static and dynamic websites, by using a headless browser with js rendering.
 
 ## What's the state of the project?
-I started the project in 2020 and interrupted it after a couple of month due to some legal obstacles to its implementation (turns out scraping requires permissions) and the change in the general pandemic sistuation.
+I started the project in 2020 and interrupted it after a couple of months due to some legal obstacles to its implementation (turns out scraping requires permissions) and the change in the general pandemic sistuation.
 
 The scraping framework was built and in a working state, there and there was a simple UI ready. 
 The project was still in a scratch/brainstorming phase when I interrupted it.
 
 ## What does ezonzoapi do?
-For the EarthDaily task I drafted an api that would work to serve ezonzo data to a hypothetical user. 
+For the EarthDaily task I drafted an api that would work to serve ezonzo product data to a hypothetical user. 
 The end user provides
 
 - its location coordinates
@@ -51,13 +51,15 @@ Which meant I had to compromise on other aspects. This is not a project that can
 
 **Assignment load requirements**
 The load requirements are handled in the design by lambda and RDS proxy, although changes would be needed to the database (read replicas, query optimisation, indices, ditching ORMs depending on data size)
-Note that in the current deployment everything is massively underprovisioned, from the RDS instance to the lambda maximum concurrency allowance.
+Note that in the aws current deployment RDS proxy isn't set up, and everything is massively underprovisioned, from the RDS instance, to the lambda maximum concurrency allowance. So while the design would be handle to handle the required load, this draft implementation most definitely wouldn't.
 
 
 **Current state of the implementation**
 The api works locally and on aws at https://ut0b3vuq6e.execute-api.us-east-1.amazonaws.com/dev/docs, where the database has been populated with some testing data consisting of 4 shops in Bologna, all in the games&toys sector, and the same 3000 products for each of them. 
 
 ```
+shops table:
+
  id |        name         |        lat         |        lon         | location |                    address                     |                       url
 ----+---------------------+--------------------+--------------------+----------+------------------------------------------------+-------------------------------------------------
   1 | Giocheria           |   44.4910507609255 | 11.346836656806383 | ...      | Via Castiglione, 11a, 40120, Bologna BO        | https://www.giocheriabologna.it
@@ -66,9 +68,9 @@ The api works locally and on aws at https://ut0b3vuq6e.execute-api.us-east-1.ama
   4 | Tempo di giocattoli | 44.488760851260565 |  11.31727048855604 | ...      | Via Saragozza, 212, 40134 Bologna BO           | https://toschestationcomics.com/andaresuamazon9
 ```
 
-The api supports GET and POST for the `/products` endpoint, and it allows to get all products within a certain distance from the user, and create new products (and shops).
+The api supports GET and POST for the `/products` endpoint. It allows to get all products within a certain distance from the user, and create new products (and shops).
 
-The POST request resource schema is a bit atypical, as it always includes the shop data.
+The POST request product schema is a bit atypical, as it always includes the shop data.
 
 
 ```
@@ -86,19 +88,19 @@ The POST request resource schema is a bit atypical, as it always includes the sh
     "url": "string"
   }
 ```
-This triggers an insert action for the product, and an insert-if-not-exists for the shop. The reason for this setup is that its user would be the actual scraper, so it's shaped around the scrapers' data model.
+This triggers a create action for the product, and a create-if-not-exists for the shop. The reason for this setup is that its user would be the actual ezonzo scraper, so it's shaped around the scrapers' data model. It could be handled better by checking for the existence of the shop and creating the shop/product in separate requests.
 
 GET is more standard and shaped around a hypothetical user basic needs:
 
 `products/?search_str=[str]&lat=[float]&lon=[float]&max_distance=[float]&max_price=[float]`
 
-Not that "max_distance" is expressed in km.
+Note that "max_distance" is expressed in km.
 
 
 
 
 ### Further notes
-This is a draft. It was constrained by my time availability (and my covid, which kept me company during the development) and the ~5 hours indication, so nothing here is up to production standards. Among other issues:
+This is a draft. It was constrained by my time availability, my covid (hich kept me company during the development) and the ~5 hours indication (although it took me more), so nothing here is up to production standards. Among other issues:
 - there is no infrastructure code
 - security wasn't thought through
 - no database optimisation
@@ -111,14 +113,17 @@ This is a draft. It was constrained by my time availability (and my covid, which
 ### Running the project:
 
 
-**Requirements**
+**Virtual environment**
 Set up a python virtual environment and install requirements
-POSTGRES SETUP
+`pip install -r requirements.txt`
+
+
+**Postgres**
 1. Install postgres
 2. `create database ezonzoapi`
 3. connect to the database and `create extension postgis`
 
-An  ./app/.env file containing:
+Create a ./app/.env file containing:
 ```
 DB_USER=[dbuser]
 DB_PASS=[dbpassword]
@@ -127,6 +132,7 @@ DB_PORT=[dbport]
 DB_NAME=ezonzoapi
 ```
 
+**Run locally**
 from the app subdirectory run
 ```
   uvicorn app:app --reload
@@ -134,17 +140,18 @@ from the app subdirectory run
 
 API documentation will be accessible at http://127.0.0.1:8000/docs
 
-tests:
+**Run unit tests**
 from ./app run `pytest test_app.py`
 
-On AWS
+**Run on the aws**
+
 Infrastructure code was not included, so it needs to be set up manually. You will need:
 
 - Docker
 - An ECR repository
 - A postgres RDS instance 
 - A lambda function with access to RDS
-- An APIGetway REST api configured as follows:
+- An APIGetway REST api with a resource configured with lambda proxy integration
 
 Build - push -deploy:
 ```
