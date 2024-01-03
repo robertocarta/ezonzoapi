@@ -1,3 +1,4 @@
+import os
 from typing import List
 from sqlalchemy import text, func
 from fastapi import FastAPI, Depends, Query
@@ -8,9 +9,9 @@ from schemas import ProductCreate, ProductBase
 from models import Base, Shop, Product, Session
 
 
-stage = '/dev'
+stage = '/dev' if "AWS_LAMBDA_FUNCTION_NAME" in os.environ else '/'
 app = FastAPI(openapi_prefix=stage)
-handler = Mangum(app, api_gateway_base_path='/dev')
+handler = Mangum(app, api_gateway_base_path=stage)
 
 engine, SessionLocal = db_setup()
 Base.metadata.create_all(bind=engine)
