@@ -6,7 +6,7 @@ Hiring assignment project for EarthDaily
 
 During the first year of the pandemic, local shops faced an existential risk due to the lockdowns, the general avoidance of public spaces, and the competition with online shops. People were aware of this problem, and most were sympathetic towards local businesses, but local shopping was just way more time demanding, risky, and cumbersome than online shopping.
 I wanted to simplify local shopping and make it competitive with online shopping during the covid years. To do so, I needed to address the following issues:
-- When you search for an item in your local area, you not guaranteed that you'll find it in a shop, which means you need to try different shops until you find what you look for (e.g. a specific cable or specific model of headphones)
+- When you go to a shop searching for an item, you are not guaranteed to find it, which means you need to try different shops until you find what you look for (e.g. a specific cable or specific model of headphones)
 - Shop-hopping is time demanding
 - Shop-hopping exposes you to health risks.
 
