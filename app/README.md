@@ -55,7 +55,16 @@ Note that in the current deployment everything is massively underprovisioned, fr
 
 
 **Current state of the implementation**
-The code works locally and on aws at https://ut0b3vuq6e.execute-api.us-east-1.amazonaws.com/dev/docs. 
+The api works locally and on aws at https://ut0b3vuq6e.execute-api.us-east-1.amazonaws.com/dev/docs, where the database has been populated with some testing data consisting of 4 shops in Bologna, all in the games&toys sector, and the same 3000 products for each of them. 
+
+```
+ id |        name         |        lat         |        lon         | location |                    address                     |                       url
+----+---------------------+--------------------+--------------------+----------+------------------------------------------------+-------------------------------------------------
+  1 | Giocheria           |   44.4910507609255 | 11.346836656806383 | ...      | Via Castiglione 11a                            | https://www.giocheriabologna.it
+  2 | Tutti Bambini       |  44.49949871123964 | 11.338983147716995 | ...      | Via Guglielmo Marconi, 32, 40122 Bologna BO    |
+  3 | Toys Centre         |  44.50605454797169 | 11.331729237761035 | ...      | Via Paolo Bovi Campeggi, 2/2, 40131 Bologna BO | http://www.toyscenter.it/
+  4 | Tempo di giocattoli | 44.488760851260565 |  11.31727048855604 | ...      | Via Saragozza, 212, 40134 Bologna BO           | https://toschestationcomics.com/andaresuamazon9
+```
 
 The api supports GET and POST for the `/products` endpoint, and it allows to get all products within a certain distance from the user, and create new products (and shops).
 
@@ -83,18 +92,19 @@ GET is more standard and shaped around a hypothetical user basic needs:
 
 `products/?search_str=[str]&lat=[float]&lon=[float]&max_distance=[float]&max_price=[float]`
 
-Not that "max_distance" is expressed in km
+Not that "max_distance" is expressed in km.
+
+
 
 
 ### Further notes
-This is a draft. It was constrained by my time availability (and my covid, which kept me company during the development) and the 4 hours indication, so nothing here is up to production standards. Among other issues:
+This is a draft. It was constrained by my time availability (and my covid, which kept me company during the development) and the ~5 hours indication, so nothing here is up to production standards. Among other issues:
 - there is no infrastructure code
 - security wasn't thought through
 - no database optimisation
 - tests only cover happy paths
 - missing endpoints
-- PostGis functionality put together without proper reading and design (this was my first experience with postgis)
-
+- PostGis functionality quickly put together (this was my first experience with postgis)
 
 
 
