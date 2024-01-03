@@ -60,7 +60,7 @@ The api works locally and on aws at https://ut0b3vuq6e.execute-api.us-east-1.ama
 ```
  id |        name         |        lat         |        lon         | location |                    address                     |                       url
 ----+---------------------+--------------------+--------------------+----------+------------------------------------------------+-------------------------------------------------
-  1 | Giocheria           |   44.4910507609255 | 11.346836656806383 | ...      | Via Castiglione 11a                            | https://www.giocheriabologna.it
+  1 | Giocheria           |   44.4910507609255 | 11.346836656806383 | ...      | Via Castiglione, 11a, 40120, Bologna BO        | https://www.giocheriabologna.it
   2 | Tutti Bambini       |  44.49949871123964 | 11.338983147716995 | ...      | Via Guglielmo Marconi, 32, 40122 Bologna BO    |
   3 | Toys Centre         |  44.50605454797169 | 11.331729237761035 | ...      | Via Paolo Bovi Campeggi, 2/2, 40131 Bologna BO | http://www.toyscenter.it/
   4 | Tempo di giocattoli | 44.488760851260565 |  11.31727048855604 | ...      | Via Saragozza, 212, 40134 Bologna BO           | https://toschestationcomics.com/andaresuamazon9
