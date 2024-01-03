@@ -153,7 +153,7 @@ Note that "max_distance" is expressed in km.
 
 ### Further notes
 This is a draft. It was constrained by my time availability, my covid (hich kept me company during the development) and the ~5 hours indication (although it took me more), so nothing here is up to production standards. Among other issues:
-- there is no infrastructure code
+- there is no infrastructure code, and services should be properly integrated (stage name is hardcoded, for instance)
 - security wasn't thought through
 - no database optimisation
 - tests only cover happy paths
@@ -162,12 +162,18 @@ This is a draft. It was constrained by my time availability, my covid (hich kept
 
 
 
+
 ### Running the project:
 
 
 **Virtual environment**
+
 Set up a python virtual environment and install requirements
-`pip install -r requirements.txt`
+```
+virtualenv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
 
 
 **Postgres**
@@ -184,6 +190,10 @@ DB_PORT=[dbport]
 DB_NAME=ezonzoapi
 ```
 
+**Run unit tests**
+from ./app run `pytest test_app.py`
+
+
 **Run locally**
 from the app subdirectory run
 ```
@@ -192,8 +202,6 @@ from the app subdirectory run
 
 API documentation will be accessible at http://127.0.0.1:8000/docs
 
-**Run unit tests**
-from ./app run `pytest test_app.py`
 
 **Run on the aws**
 
@@ -203,7 +211,7 @@ Infrastructure code was not included, so it needs to be set up manually. You wil
 - An ECR repository
 - A postgres RDS instance 
 - A lambda function with access to RDS
-- An APIGateway REST api with a resource configured with lambda proxy integration
+- An APIGateway REST api with a resource configured with lambda proxy integration, deployed with a stage named "dev"
 
 Build->push->deploy:
 ```
