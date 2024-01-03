@@ -1,3 +1,7 @@
+# Ezonzo api
+
+Hiring assignment project for ED
+
 ## What is Ezonzo?
 
 During the first year of the pandemic, local shops faced an existential risk due to the lockdowns, the general avoidance of public spaces, and the competition with online shops. People were aware of this problem, and most were sympathetic towards local business, but local shopping was just way more time demanding, risky, and immediate than online shopping.
