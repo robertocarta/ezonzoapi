@@ -1,6 +1,6 @@
 # Ezonzo api
 
-Hiring assignment project for ED
+Hiring assignment project for EarthDaily
 
 ## What is Ezonzo?
 
