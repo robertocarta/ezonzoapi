@@ -1,10 +1,4 @@
-from typing import List
 from pydantic import BaseModel
-from datetime import date
-
-
-
-
 
 
 class ShopCreate(BaseModel):
@@ -15,7 +9,6 @@ class ShopCreate(BaseModel):
     url: str
 
 
-
 class ProductBase(BaseModel):
     id: int
     name: str
@@ -24,9 +17,10 @@ class ProductBase(BaseModel):
     tags: str
     shopid: int
     url: str
+    model_config = {
+            'from_attributes': True
+            }
 
-    class Config:
-        orm_mode = True
 
 class ProductCreate(BaseModel):
     url: str
@@ -35,5 +29,3 @@ class ProductCreate(BaseModel):
     thumbnail: str
     tags: str
     shop: ShopCreate
-
-

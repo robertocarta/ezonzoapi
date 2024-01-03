@@ -1,13 +1,10 @@
 from fastapi.testclient import TestClient
-from app.app import app, get_session, _create_product
-from app.database import db_setup
-from app.models import Base, Product, Shop
-from app.schemas import ShopCreate, ProductCreate
-import os
+from app import app, get_session, _create_product, _get_products
+from database import db_setup
+from models import Base, Product, Shop
+from schemas import ShopCreate, ProductCreate
 from sqlalchemy.orm import Session
 import pytest
-
-from app.schemas import ShopCreate
 
 
 SHOPS_DATA = (
@@ -37,21 +34,21 @@ SHOPS_DATA = (
 PRODUCTS_DATA = (
         {
             "url": "https://example.it",
-            "name": "Product A",
+            "name": "Product X A",
             "price": 50,
             "thumbnail": "",
             "tags": "Tags A",
             },
         {
             "url": "https://example.it",
-            "name": "Product B",
+            "name": "Product X B",
             "price": 30,
             "thumbnail": "",
             "tags": "Tags B",
             },
         {
             "url": "https://example.it",
-            "name": "Product C",
+            "name": "Product Y C",
             "price": 20,
             "thumbnail": "",
             "tags":  "Tags c"
@@ -118,6 +115,7 @@ def test_shop_get_or_create(session: Session):
     new_shop_found = session.query(Shop).filter(Shop.id == new_shop.id).first()
     assert new_shop_found
 
+
 def test_create_product_stores_data(session, test_data):
     shops, products = test_data
 
@@ -129,6 +127,7 @@ def test_create_product_stores_data(session, test_data):
     assert len(shops_found) == len(shops)
     assert len(products_found) == len(products)
 
+
 def test_create_product_returns_obj_data(client):
     product_data = dict(PRODUCTS_DATA[0])
     body = dict(product_data)
@@ -138,32 +137,25 @@ def test_create_product_returns_obj_data(client):
     assert response.status_code == 201
     assert response.json() == {**product_data, 'id': 1, 'shopid': 1}
 
-
-
-
-
-
-    # products = [
-    #         (f'prod_{i}', 'www.example.com', 10, 'www.example.com', 'tags_i')
-    #         for i in range(10)
-    #         ]
-    # products = 
-    # for product in 
-    #
-    #     body = {
-    #             "url": mongo_doc['url'],
-    #             "name": mongo_doc['title'],
-    #             "price": mongo_doc['price'],
-    #             "thumbnail": mongo_doc['thumbnail'],
-    #             "tags": mongo_doc['thumbnail'],
-    #             "shop": {
-    #                 "name": mongo_doc['shop'],
-    #                 "lat": 44.491189334186075,
-    #                 "lon": 11.346369127270156,
-    #                 "address": "Via Castiglione, 11 A, 40124 Bologna BO",
-    #                 "url": "https://giocheria.it/"
-    #                 }
-    #             }
-    #     resp = requests.post("http://127.0.0.1:8000/products/", json=body)
-    #
-    # pass
+#
+def test__get_products_returns_correct_data(session: Session, test_data):
+    # populate database
+    test_create_product_stores_data(session, test_data)
+    shops, products = test_data
+    target_shop = shops[0]
+    res = _get_products('Product',
+                        target_shop.lat,
+                        target_shop.lon,
+                        0.01,
+                        30,
+                        session)
+    products = [
+            product for product, shop in
+            session.query(Product, Shop).join( Shop, Shop.id == Product.shopid ).all()
+            if (
+                product.price <= 30 and
+                'Product' in product.name and
+                shop.lat == target_shop.lat and
+                shop.lon == target_shop.lon)
+            ]
+    assert len(res) == len(products)

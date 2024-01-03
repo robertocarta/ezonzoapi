@@ -7,9 +7,10 @@ from app.schemas import ShopCreate
 class Shop(Base):
     __tablename__ = 'shop'
     id = Column(Integer, primary_key=True)
-    name = Column(String)
-    lat = Column(Float)
-    lon = Column(Float)
+    name = Column(String, nullable=False)
+    lat = Column(Float, nullable=False)
+    lon = Column(Float, nullable=False)
+    location = Column(Geography(geometry_type='POINT'), nullable=False)
     address = Column(String)
     url = Column(String)
 
