@@ -151,7 +151,7 @@ Infrastructure code was not included, so it needs to be set up manually. You wil
 - An ECR repository
 - A postgres RDS instance 
 - A lambda function with access to RDS
-- An APIGetway REST api with a resource configured with lambda proxy integration
+- An APIGateway REST api with a resource configured with lambda proxy integration
 
 Build - push -deploy:
 ```
