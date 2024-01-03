@@ -33,7 +33,8 @@ For this task, Ezonzoapi simply returns all the products that match. As I imagin
 
 Ezonzoapi is written in python 3.10 using the FastApi framework, and deployed on the AWS serverless stack (API Gateway, Lambda, RDS Proxy), a postgres database with the postgis extension
 
-![[Pasted image 20240103132708.png]]
+![image](https://github.com/robertocarta/ezonzoapi/assets/15035783/ecb7ad52-fcc4-4179-a4d2-757049d70490)
+
 ## Earth daily assignment:
 
 For this assignment I decided to give priority to the following instruction:
